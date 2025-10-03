@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketPlace - Главная</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav container">
+            <div class="logo">
+                <span>🛍️</span>
+                MarketPlace
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Главная</a>
+                <a href="login.html" class="nav-link">Вход</a>
+                <a href="register.html" class="nav-link">Регистрация</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1 class="auth-title">Добро пожаловать!</h1>
+                <p class="auth-subtitle">Выберите действие для продолжения</p>
+            </div>
+            
+            <div style="display: grid; gap: 1rem;">
+                <a href="login.html" class="btn btn-primary" style="text-align: center;">
+                    Войти в систему
+                </a>
+                <a href="register.html" class="btn btn-primary" style="text-align: center; background: var(--gray-500);">
+                    Зарегистрироваться
+                </a>
+            </div>
+
+            <div style="margin-top: 2rem; padding: 1.5rem; background: var(--gray-100); border-radius: 8px;">
+                <h3 style="margin-bottom: 1rem; color: var(--gray-700);">О системе</h3>
+                <div style="display: grid; gap: 0.5rem; font-size: 0.9rem; color: var(--gray-600);">
+                    <div>🔐 Безопасная аутентификация</div>
+                    <div>👥 Три типа пользователей</div>
+                    <div>📊 История покупок</div>
+                    <div>🎯 Личный кабинет</div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

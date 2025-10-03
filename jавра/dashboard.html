@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет - MarketPlace</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav container">
+            <div class="logo">
+                <span>🛍️</span>
+                MarketPlace
+            </div>
+            <div class="nav-links">
+                <a href="dashboard.html" class="nav-link">Главная</a>
+                <a href="profile.html" class="nav-link">Профиль</a>
+                <a href="purchases.html" class="nav-link">Покупки</a>
+                <div id="adminLink" style="display: none;">
+                    <a href="admin.html" class="nav-link">Админ-панель</a>
+                </div>
+            </div>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span id="userName">Пользователь</span>
+                    <span id="userRole" class="role-badge role-client">Клиент</span>
+                </div>
+                <a href="logout.php" class="btn btn-logout">Выйти</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title" id="welcomeTitle">Добро пожаловать!</h1>
+                <p class="dashboard-subtitle" id="welcomeSubtitle">Управляйте вашим аккаунтом</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalPurchases">0</div>
+                    <div class="stat-label">Всего покупок</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSpent">0 ₽</div>
+                    <div class="stat-label">Потрачено всего</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="accountAge">0 дн.</div>
+                    <div class="stat-label">Аккаунт создан</div>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h2 class="section-title">Быстрый доступ</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <a href="profile.html" class="btn btn-primary">Редактировать профиль</a>
+                    <a href="purchases.html" class="btn btn-primary">История покупок</a>
+                    <div id="sellerActions" style="display: none;">
+                        <a href="products.html" class="btn btn-primary">Мои товары</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h2 class="section-title">Последние покупки</h2>
+                <div id="recentPurchases">
+                    <!-- Покупки будут загружены через JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Загрузка данных пользователя
+        async function loadUserData() {
+            try {
+                const response = await fetch('user.php?action=get_data');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('userName').textContent = data.user.username;
+                    document.getElementById('welcomeTitle').textContent = `Добро пожаловать, ${data.user.full_name}!`;
+                    
+                    // Установка роли
+                    const roleElement = document.getElementById('userRole');
+                    roleElement.textContent = data.user.role;
+                    roleElement.className = `role-badge role-${data.user.role}`;
+                    
+                    // Показ/скрытие админ-панели
+                    if (data.user.role === 'admin') {
+                        document.getElementById('adminLink').style.display = 'block';
+                    }
+                    
+                    // Показ/скрытие действий продавца
+                    if (data.user.role === 'seller' || data.user.role === 'admin') {
+                        document.getElementById('sellerActions').style.display = 'block';
+                    }
+                    
+                    // Загрузка статистики
+                    document.getElementById('totalPurchases').textContent = data.stats.total_purchases;
+                    document.getElementById('totalSpent').textContent = data.stats.total_spent + ' ₽';
+                    document.getElementById('accountAge').textContent = data.stats.account_age + ' дн.';
+                    
+                    // Загрузка последних покупок
+                    loadRecentPurchases();
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки данных:', error);
+            }
+        }
+
+        async function loadRecentPurchases() {
+            try {
+                const response = await fetch('purchases.php?action=get_recent');
+                const data = await response.json();
+                
+                const container = document.getElementById('recentPurchases');
+                
+                if (data.success && data.purchases.length > 0) {
+                    container.innerHTML = data.purchases.map(purchase => `
+                        <div class="purchase-item">
+                            <div style="font-size: 2rem;">📦</div>
+                            <div class="purchase-info">
+                                <div class="purchase-title">${purchase.product_name}</div>
+                                <div class="purchase-date">${purchase.purchase_date}</div>
+                            </div>
+                            <div class="purchase-price">${purchase.price} ₽</div>
+                            <span class="status-badge status-${purchase.status}">${getStatusText(purchase.status)}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<p style="text-align: center; color: var(--gray-500);">Покупок пока нет</p>';
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки покупок:', error);
+            }
+        }
+
+        function getStatusText(status) {
+            const statuses = {
+                'completed': 'Завершено',
+                'pending': 'В обработке',
+                'cancelled': 'Отменено'
+            };
+            return statuses[status] || status;
+        }
+
+        // Загрузка данных при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadUserData);
+    </script>
+</body>
+</html>
