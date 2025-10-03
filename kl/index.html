@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketPlace - Система управления</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header hidden" id="header">
+        <div class="logo">🛍️ MarketPlace</div>
+        <nav class="nav">
+            <button class="nav-btn active" onclick="showSection('dashboard')">Главная</button>
+            <button class="nav-btn" onclick="showSection('products')">Товары</button>
+            <button class="nav-btn" onclick="showSection('purchases')">Мои покупки</button>
+            <button class="nav-btn" onclick="showSection('profile')">Профиль</button>
+            <button class="nav-btn" id="adminBtn" onclick="showSection('admin')" style="display: none;">Админ-панель</button>
+        </nav>
+        <div class="user-info">
+            <span id="userWelcome"></span>
+            <span class="role-badge" id="userRole"></span>
+            <button class="btn" onclick="logout()">Выйти</button>
+        </div>
+    </header>
+
+    <!-- Auth Section -->
+    <div class="container" id="authContainer">
+        <div class="auth-container">
+            <div class="auth-box">
+                <div class="auth-toggle">
+                    <button class="toggle-btn active" onclick="showAuthForm('login')">Вход</button>
+                    <button class="toggle-btn" onclick="showAuthForm('register')">Регистрация</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label">Имя пользователя</label>
+                        <input type="text" class="form-input" id="loginUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" class="form-input" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Войти</button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label class="form-label">Имя пользователя</label>
+                        <input type="text" class="form-input" id="regUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Полное имя</label>
+                        <input type="text" class="form-input" id="regFullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" class="form-input" id="regPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Роль</label>
+                        <select class="form-select" id="regRole">
+                            <option value="client">Клиент</option>
+                            <option value="seller">Продавец</option>
+                            
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                </form>
+
+                <div id="authMessage"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="container hidden" id="mainContainer">
+        <div class="dashboard">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <h3>Панель управления</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="active" onclick="showSection('dashboard')">📊 Обзор</a></li>
+                    <li><a href="#" onclick="showSection('products')">🛒 Товары</a></li>
+                    <li><a href="#" onclick="showSection('purchases')">📦 Мои покупки</a></li>
+                    <li><a href="#" onclick="showSection('sales')" id="salesMenu" style="display: none;">💰 Мои продажи</a></li>
+                    <li><a href="#" onclick="showSection('profile')">👤 Профиль</a></li>
+                    <li><a href="#" onclick="showSection('admin')" id="adminMenu" style="display: none;">⚙️ Админ-панель</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Dashboard Section -->
+                <section id="dashboardSection" class="section active">
+                    <h2>Добро пожаловать, <span id="dashboardUsername"></span>!</h2>
+                    <div class="profile-card">
+                        <h3>Ваша статистика</h3>
+                        <div class="profile-info">
+                            <div class="info-item">
+                                <span>Роль:</span>
+                                <span id="statRole"></span>
+                            </div>
+                            <div class="info-item">
+                                <span>Всего покупок:</span>
+                                <span id="statPurchases">0</span>
+                            </div>
+                            <div class="info-item">
+                                <span>Всего продаж:</span>
+                                <span id="statSales">0</span>
+                            </div>
+                            <div class="info-item">
+                                <span>Баланс:</span>
+                                <span id="statBalance">0 ₽</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Products Section -->
+                <section id="productsSection" class="section">
+                    <h2>Каталог товаров</h2>
+                    <button class="btn btn-primary" id="addProductBtn" style="display: none;" onclick="showAddProductForm()">Добавить товар</button>
+                    <div class="products-grid" id="productsGrid"></div>
+                </section>
+
+                <!-- Purchases Section -->
+                <section id="purchasesSection" class="section">
+                    <h2>История покупок</h2>
+                    <div class="purchase-history" id="purchaseHistory"></div>
+                </section>
+
+                <!-- Profile Section -->
+                <section id="profileSection" class="section">
+                    <h2>Личный кабинет</h2>
+                    <div class="profile-card">
+                        <h3>Личные данные</h3>
+                        <div class="profile-info">
+                            <div class="info-item">
+                                <span>Имя пользователя:</span>
+                                <span id="profileUsername"></span>
+                            </div>
+                            <div class="info-item">
+                                <span>Полное имя:</span>
+                                <span id="profileFullName"></span>
+                            </div>
+                            <div class="info-item">
+                                <span>Роль:</span>
+                                <span id="profileRole"></span>
+                            </div>
+                            <div class="info-item">
+                                <span>Дата регистрации:</span>
+                                <span id="profileRegDate"></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Admin Section -->
+                <section id="adminSection" class="section">
+                    <h2>Административная панель</h2>
+                    <div class="admin-stats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalUsers">0</div>
+                            <div>Пользователей</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalProducts">0</div>
+                            <div>Товаров</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalPurchases">0</div>
+                            <div>Покупок</div>
+                        </div>
+                    </div>
+
+                    <h3>Управление пользователями</h3>
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Имя пользователя</th>
+                                <th>Полное имя</th>
+                                <th>Роль</th>
+                                <th>Дата регистрации</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable"></tbody>
+                    </table>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
